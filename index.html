@@ -1,0 +1,56 @@
+﻿<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+</head><body>
+
+<h1>table-view</h1>
+
+<script type="module" src="./table-view.js"></script>
+
+<table-view src="./company2.csv"></table-view>
+
+<style>
+table-view table {
+  height: calc(100vh - 10em);
+  overflow: scroll;
+  display: inline-block;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-top: 1px solid black;
+  border-left: 1px solid black;
+}
+table-view th, table-view td {
+  border-right: 1px solid black;
+  border-bottom: 1px solid black;
+  padding: 0 .3em;
+}
+table-view tr:first-child {
+  position: sticky;
+  top: 0;
+  background-color: white;
+}
+table-view .control {
+  border: 1px solid black;
+  margin-top: 0;
+  padding: .2em;
+}
+table-view .control input {
+  margin-right: .5em;
+}
+table-view .control button {
+  margin-right: .5em;
+}
+table-view .control span {
+  font-size: 80%;
+  display: inline-block;
+  margin: 0 .5em;
+  cursor: pointer;
+}
+table-view .sortbtn {
+  font-size: 70%;
+  float: right;
+  display: block;
+  margin-top: .3em;
+}
+</style>
+
+</body>
+</html>
