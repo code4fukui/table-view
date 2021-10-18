@@ -21,7 +21,7 @@ onload = async () => {
       return btn;
     },
   };
-  list.appendChild(new TableView(data, opts));
+  list.appendChild(new TableView(data.slice(0, 201), opts));
 };
 </script>
 

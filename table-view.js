@@ -122,7 +122,7 @@ class TableView extends HTMLElement {
     };
     const showInit = (data2) => {
       showdata = data2;
-      npage = Math.floor((showdata.length - 1) / pagen) + (showdata.length - 1 % pagen == 0 ? 0 : 1);
+      npage = Math.floor((showdata.length - 1) / pagen) + ((showdata.length - 1) % pagen == 0 ? 0 : 1);
       page = 0;
       nview.value = "表示件数: " + (showdata.length - 1) + " / " + (data.length - 1);
 
