@@ -160,6 +160,7 @@ class TableView extends HTMLElement {
       showInit(filtered);
     };
     btn.onclick = () => {
+      inp.value = "";
       showInit(data);
     };
     const nview = create("input", div);
