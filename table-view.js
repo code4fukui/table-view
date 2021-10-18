@@ -39,7 +39,7 @@ class TableView extends HTMLElement {
     
     const pagen = 100;
     let page = 0;
-    let npage = Math.floor((data.length - 1) / pagen) + (data.length - 1 % pagen == 0 ? 0 : 1);
+    let npage = Math.floor((data.length - 1) / pagen) + ((data.length - 1) % pagen == 0 ? 0 : 1);
     let showdata = null;
     const sorts = [];
     const addSort = (sortkey, up) => {
