@@ -108,7 +108,6 @@ class TableView extends HTMLElement {
         if (opts.appendColumn) {
           const header = data.slice(0, 1)[0];
           const csv = [header, b];
-          console.log(csv);
           const json = CSV.toJSON(csv)[0];
           const div = opts.appendColumn(json);
           b2.unshift(div);
