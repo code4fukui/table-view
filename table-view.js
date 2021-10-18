@@ -2,13 +2,40 @@
 import { CSV } from "https://js.sabae.cc/CSV.js";
 
 class TableView extends HTMLElement {
-  constructor() {
+  constructor(data, opts) {
     super();
-    this.init();
+    this.init(data, opts);
   }
-  async init() {
-    const data = await CSV.fetch(this.getAttribute("src"));
-    const divtbl = create("div", this);
+  async init(data, opts = {}) {
+    if (opts) {
+      for (const name in opts) {
+        if (opts[name] != null) {
+          this.setAttribute(name, opts[name]);
+        }
+      }
+    }
+
+    if (data == null) {
+      data = await CSV.fetch(this.getAttribute("src"));
+    }
+    //const divf = create("div");
+    if (opts.appendHeader) {
+      this.appendChild(opts.appendHeader());
+    }
+
+    const inp = create("input", this);
+    inp.placeholder = "キーワード";
+    const btnfilter = create("button", this);
+    btnfilter.textContent = "フィルタ";
+    const btn = createButton("フィルタ解除", this);
+    btn.style.marginLeft = ".5em";
+    [inp, btn, btnfilter].forEach(d => {
+      d.style.height = "2em";
+      d.style.boxSizing = "border-box";
+      //d.style.verticalAlign = "middle";
+    });
+    
+    const divtbl = create("div", this, "table");
     
     const pagen = 100;
     let page = 0;
@@ -21,20 +48,24 @@ class TableView extends HTMLElement {
         const ns = sorts.indexOf(s);
         sorts.splice(ns, 1);
       }
+      
       sorts.unshift({ key: sortkey, up });
-      console.log(sorts);
-      /*
+      
       const header = showdata.slice(0, 1);
       const sort = sorts[0];
       const nsort = header[0].findIndex(s => s == sort.key);
-      showdata.sort((a, b) => {
+      const showdata2 = [];
+      for (let i = 1; i < showdata.length; i++) {
+        showdata2.push(showdata[i]); // .slice(1));
+      }
+      showdata2.sort((a, b) => {
         //const nlen = showdata.length;
         //console.log(sort.key);
         const n = a[nsort].localeCompare(b[nsort]);
         return sort.up ? n : -n;
       });
-      showdata.unshift(header);
-      */
+      showdata2.unshift(header[0]);
+      showdata = showdata2;
       show();
     };
     const show = (n = page) => {
@@ -60,15 +91,41 @@ class TableView extends HTMLElement {
         return div;
       });
       const body = data.length > 1 ? data.slice(1 + n * pagen, 1 + (n + 1) * pagen) : [];
-      body.unshift(header);
       divtbl.innerHTML = "";
-      createTable(body, divtbl);
+      const body2 = body.map(b => {
+        const b2 = [b[0]];
+        // 最大表示文字列数設定
+        const maxlen = 70;
+        for (let i = 1; i < b.length; i++) {
+          if (b[i].length > maxlen) {
+            b2[i] = b[i].substring(0, maxlen) + "…";
+          } else {
+            b2[i] = b[i];
+          }
+        }
+
+        // 列追加
+        if (opts.appendColumn) {
+          const header = data.slice(0, 1)[0];
+          const csv = [header, b];
+          console.log(csv);
+          const json = CSV.toJSON(csv)[0];
+          const div = opts.appendColumn(json);
+          b2.unshift(div);
+        }
+        return b2;
+      });
+      if (opts.appendColumn) {
+        header.unshift(""); // [0] = "";
+      }
+      body2.unshift(header);
+      createTable(body2, divtbl);
     };
     const showInit = (data2) => {
       showdata = data2;
       npage = Math.floor((showdata.length - 1) / pagen) + (showdata.length - 1 % pagen == 0 ? 0 : 1);
       page = 0;
-      nview.value = "表示件数: " + showdata.length + " / " + data.length;
+      nview.value = "表示件数: " + (showdata.length - 1) + " / " + (data.length - 1);
 
       sel.innerHTML = "";
       for (let i = 1; i <= npage; i++) {
@@ -79,23 +136,30 @@ class TableView extends HTMLElement {
     let sel = create("select");
     sel.onchange = () => show(parseInt(sel.value.split(" ")[1]) - 1);
     const div = create("div", this, "control");
-    const inp = create("input", div);
-    inp.placeholder = "全文検索フィルタ";
     inp.onchange = () => {
-      const key = inp.value;
+      // todo: JISX0213 normalize
+      const keys = inp.value.replace("　", " ").split(" ");
       const filtered = [data[0]];
-      for (let i = 1; i < data.length; i++) {
+      B: for (let i = 1; i < data.length; i++) {
         const d = data[i];
-        for (const v of d) {
-          if (v.indexOf(key) >= 0) {
-            filtered.push(d);
+        for (const key of keys) {
+          let flg = false;
+          A: for (const v of d) {
+            if (typeof v == "string") {
+              if (v.indexOf(key) >= 0) {
+                flg = true;
+                break A;
+              }
+            }
+          }
+          if (!flg) {
+            continue B;
           }
         }
+        filtered.push(d);
       }
-      console.log(filtered);
       showInit(filtered);
     };
-    const btn = createButton("全件表示", div);
     btn.onclick = () => {
       showInit(data);
     };
