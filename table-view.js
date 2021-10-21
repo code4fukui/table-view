@@ -72,7 +72,8 @@ class TableView extends HTMLElement {
         } catch (e) {
         }
         return false;
-      };
+      });
+    }
 
     const inp = create("input", this);
     inp.placeholder = "キーワード";
