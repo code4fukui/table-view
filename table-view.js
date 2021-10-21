@@ -68,7 +68,7 @@ class TableView extends HTMLElement {
           return true;
         }
         try {
-          return new Day(d[nparam]).includes(sday, eday));
+          return new Day(d[nparam]).includes(sday, eday);
         } catch (e) {
         }
         return false;
