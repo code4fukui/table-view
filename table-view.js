@@ -63,8 +63,16 @@ class TableView extends HTMLElement {
       const nparam = data[0].indexOf(dayselect.value);
       const sday = startday.value ? new Day(startday.value) : new Day(1, 1, 1);
       const eday = endday.value ? new Day(endday.value) : new Day(3000, 1, 1);
-      return data.filter((d, idx) => idx == 0 || new Day(d[nparam]).includes(sday, eday));
-    };
+      return data.filter((d, idx) => {
+        if (idx == 0) {
+          return true;
+        }
+        try {
+          return new Day(d[nparam]).includes(sday, eday));
+        } catch (e) {
+        }
+        return false;
+      };
 
     const inp = create("input", this);
     inp.placeholder = "キーワード";
