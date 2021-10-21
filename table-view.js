@@ -4,7 +4,7 @@ import { Day } from "https://js.sabae.cc/DateTime.js";
 import { InputDate } from "https://code4fukui.github.io/input-datetime/input-date.js";
 
 const isDay = (s) => {
-  return s.match(/(\d\d\d\d-\d\d-\d\d)/) != null;
+  return s.match(/^(\d\d\d\d-\d\d-\d\d)/) != null;
 };
 
 const getDateColumns = (data) => {
