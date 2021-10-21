@@ -1,5 +1,26 @@
 ﻿import { create, createTable, createSelect, createButton } from "https://js.sabae.cc/stdcomp.js";
 import { CSV } from "https://js.sabae.cc/CSV.js";
+import { Day } from "https://js.sabae.cc/DateTime.js";
+import { InputDate } from "https://code4fukui.github.io/input-datetime/input-date.js";
+
+const isDay = (s) => {
+  return s.match(/(\d\d\d\d-\d\d-\d\d)/) != null;
+};
+
+const getDateColumns = (data) => {
+  if (data.length < 2) {
+    return [];
+  }
+  const res = [];
+  for (let i = 0; i < data[1].length; i++) {
+    const d = data[1][i];
+    //if (Day.isDay(d)) {
+    if (isDay(d)) {
+      res.push(data[0][i]);
+    }
+  }
+  return res;
+};
 
 class TableView extends HTMLElement {
   constructor(data, opts) {
@@ -18,10 +39,32 @@ class TableView extends HTMLElement {
     if (data == null) {
       data = await CSV.fetch(this.getAttribute("src"));
     }
+
     //const divf = create("div");
     if (opts.appendHeader) {
       this.appendChild(opts.appendHeader());
     }
+    const days = getDateColumns(data);
+    let dayselect, startday, endday;
+    if (days.length > 0) {
+      const div = create("div", this);
+      div.className = "datefilter";
+      dayselect = createSelect(days, div);
+      startday = new InputDate();
+      div.appendChild(startday);
+      create("span", div).textContent = "〜";
+      endday = new InputDate();
+      div.appendChild(endday);
+    }
+    const filterDay = (data) => {
+      if (dayselect == null) {
+        return data;
+      }
+      const nparam = data[0].indexOf(dayselect.value);
+      const sday = startday.value ? new Day(startday.value) : new Day(1, 1, 1);
+      const eday = endday.value ? new Day(endday.value) : new Day(3000, 1, 1);
+      return data.filter((d, idx) => idx == 0 || new Day(d[nparam]).includes(sday, eday));
+    };
 
     const inp = create("input", this);
     inp.placeholder = "キーワード";
@@ -41,18 +84,14 @@ class TableView extends HTMLElement {
     let page = 0;
     let npage = Math.floor((data.length - 1) / pagen) + ((data.length - 1) % pagen == 0 ? 0 : 1);
     let showdata = null;
+
     const sorts = [];
-    const addSort = (sortkey, up) => {
-      const s = sorts.find(s => s.key == sortkey);
-      if (s) {
-        const ns = sorts.indexOf(s);
-        sorts.splice(ns, 1);
-      }
-      
-      sorts.unshift({ key: sortkey, up });
-      
-      const header = showdata.slice(0, 1);
+    const flashSort = () => {
       const sort = sorts[0];
+      if (!sort) {
+        return;
+      }
+      const header = showdata.slice(0, 1);
       const nsort = header[0].findIndex(s => s == sort.key);
       const showdata2 = [];
       for (let i = 1; i < showdata.length; i++) {
@@ -66,6 +105,16 @@ class TableView extends HTMLElement {
       });
       showdata2.unshift(header[0]);
       showdata = showdata2;
+    };
+    const addSort = (sortkey, up) => {
+      const s = sorts.find(s => s.key == sortkey);
+      if (s) {
+        const ns = sorts.indexOf(s);
+        sorts.splice(ns, 1);
+      }
+      
+      sorts.unshift({ key: sortkey, up });
+      flashSort();
       show();
     };
     const show = (n = page) => {
@@ -122,6 +171,9 @@ class TableView extends HTMLElement {
     };
     const showInit = (data2) => {
       showdata = data2;
+
+      showdata = filterDay(data2);
+      flashSort();
       npage = Math.floor((showdata.length - 1) / pagen) + ((showdata.length - 1) % pagen == 0 ? 0 : 1);
       page = 0;
       nview.value = "表示件数: " + (showdata.length - 1) + " / " + (data.length - 1);
@@ -181,6 +233,20 @@ class TableView extends HTMLElement {
       }
     });
     showInit(data);
+
+    if (dayselect) {
+      const redraw = () => {
+        showInit(data);
+      };
+      startday.onchange = redraw;
+      endday.onchange = redraw;
+      dayselect.onchange = redraw;
+    }
+    if (this.getAttribute("sortkey")) {
+      //console.log(this.getAttribute("sortascending"));
+      //console.log(this.getAttribute("sortascending2"));
+      addSort(this.getAttribute("sortkey"), this.getAttribute("sortdesc") !== "");
+    }
   }
 }
 

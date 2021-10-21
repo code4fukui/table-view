@@ -5,7 +5,7 @@
 
 <script type="module" src="./table-view.js"></script>
 
-<table-view src="./company2.csv"></table-view>
+<table-view src="./company2.csv" sortkey=moddate x-sortkey=corporateID sortdesc></table-view>
 
 <style>
 table-view table {
@@ -49,6 +49,12 @@ table-view .sortbtn {
   float: right;
   display: block;
   margin-top: .3em;
+}
+table-view .datefilter {
+  display: inline-block;
+}
+table-view .datefilter input-date {
+  display: inline-block;
 }
 </style>
 
