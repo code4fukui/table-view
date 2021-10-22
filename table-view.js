@@ -98,7 +98,7 @@ class TableView extends HTMLElement {
     const flashSort = () => {
       const sort = sorts[0];
       if (!sort) {
-        return;
+        return null;
       }
       const header = showdata.slice(0, 1);
       const nsort = header[0].findIndex(s => s == sort.key);
@@ -114,6 +114,7 @@ class TableView extends HTMLElement {
       });
       showdata2.unshift(header[0]);
       showdata = showdata2;
+      return sort;
     };
     const addSort = (sortkey, up) => {
       const s = sorts.find(s => s.key == sortkey);
@@ -125,6 +126,7 @@ class TableView extends HTMLElement {
       sorts.unshift({ key: sortkey, up });
       flashSort();
       show();
+      updateStatus();
     };
     const show = (n = page) => {
       const data = showdata;
@@ -135,17 +137,22 @@ class TableView extends HTMLElement {
       }
       page = n;
       sel.value = "page " + (page + 1);
+      const sort = sorts[0];
       const header = data.slice(0, 1)[0].map(h => {
         const div = create("div");
         const name = create("span", div);
         name.textContent = h;
         const btns = create("span", div, "sortbtn");
         const upbtn = create("span", btns);
-        upbtn.textContent = "▲";
+        upbtn.textContent = sort?.key == h && sort?.up ? "△" : "▲";
         const downbtn = create("span", btns);
-        downbtn.textContent = "▼";
-        upbtn.onclick = () => addSort(h, true);
-        downbtn.onclick = () => addSort(h, false);
+        downbtn.textContent = sort?.key == h && !sort?.up ? "▽" : "▼";
+        upbtn.onclick = () => {
+          addSort(h, true);
+        };
+        downbtn.onclick = () => {
+          addSort(h, false);
+        }
         return div;
       });
       const body = data.length > 1 ? data.slice(1 + n * pagen, 1 + (n + 1) * pagen) : [];
@@ -178,25 +185,31 @@ class TableView extends HTMLElement {
       body2.unshift(header);
       createTable(body2, divtbl);
     };
-    const showInit = (data2) => {
-      showdata = data2;
-
-      showdata = filterDay(data2);
-      flashSort();
+    const updateStatus = () => {
       npage = Math.floor((showdata.length - 1) / pagen) + ((showdata.length - 1) % pagen == 0 ? 0 : 1);
       page = 0;
-      nview.value = "表示件数: " + (showdata.length - 1) + " / " + (data.length - 1);
+      const sort = sorts[0];
+      nview.textContent = "表示件数: " + (showdata.length - 1) + " / " + (data.length - 1) + (sort ? " 表示順: " + sort.key + (sort.up ? " 昇順" : " 降順") : "");
 
       sel.innerHTML = "";
       for (let i = 1; i <= npage; i++) {
         create("option", sel).textContent = "page " + i;
       }
+    };
+    const showInit = (data2) => {
+      showdata = data2;
+
+      showdata = filterDay(data2);
+      showdata = filterKeyword(showdata);
+      const sort = flashSort();
+      updateStatus();
       show(0);
     };
     let sel = create("select");
     sel.onchange = () => show(parseInt(sel.value.split(" ")[1]) - 1);
     const div = create("div", this, "control");
-    inp.onchange = () => {
+
+    const filterKeyword = (data) => {
       // todo: JISX0213 normalize
       const keys = inp.value.replace("　", " ").split(" ");
       const filtered = [data[0]];
@@ -218,14 +231,18 @@ class TableView extends HTMLElement {
         }
         filtered.push(d);
       }
-      showInit(filtered);
+      return filtered;
+    };
+    inp.onchange = () => {
+      showInit(data);
     };
     btn.onclick = () => {
       inp.value = "";
       showInit(data);
     };
-    const nview = create("input", div);
-    nview.disabled = true;
+    //const nview = create("input", div);
+    //nview.disabled = true;
+    const nview = create("span", div);
     [
       ["◀◀", () => show(0)],
       ["◀", () => show(page - 1)],
