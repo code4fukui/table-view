@@ -13,9 +13,15 @@ const getDateColumns = (data) => {
   }
   const res = [];
   for (let i = 0; i < data[1].length; i++) {
-    const d = data[1][i];
-    //if (Day.isDay(d)) {
-    if (isDay(d)) {
+    let flg = true;
+    for (let j = 1; j < data.length; j++) {
+      const d = data[j][i];
+      if (d && !isDay(d)) {
+        flg = false;
+        break;
+      }
+    }
+    if (flg) {
       res.push(data[0][i]);
     }
   }
@@ -191,7 +197,7 @@ class TableView extends HTMLElement {
       page = 0;
       const sort = sorts[0];
       //nview.textContent = "表示件数: " + (showdata.length - 1) + " / " + (data.length - 1) + (sort ? " 表示順: " + sort.key + (sort.up ? " 昇順" : " 降順") : "");
-      const txtsort = (sort ? " 表示順: " + sort.key + (sort.up ? "昇順" : "降順") : "");
+      const txtsort = (sort ? " 表示順: " + sort.key + (sort.up ? " 昇順" : " 降順") : "");
       const txtsum = "表示件数: " + (showdata.length - 1) + " / " + (data.length - 1);
       sortview.textContent = txtsort;
       nview.textContent = txtsum;
