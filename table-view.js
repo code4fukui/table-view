@@ -192,7 +192,8 @@ class TableView extends HTMLElement {
       //nview.textContent = "表示件数: " + (showdata.length - 1) + " / " + (data.length - 1) + (sort ? " 表示順: " + sort.key + (sort.up ? " 昇順" : " 降順") : "");
       const txtsort = (sort ? " 表示順: " + sort.key + (sort.up ? "昇順" : "降順") : "");
       const txtsum = "表示件数: " + (showdata.length - 1) + " / " + (data.length - 1);
-      nview.textContent = txtsort + " " + txtsum;
+      sortview.textContent = txtsort;
+      nview.textContent = txtsum;
 
       sel.innerHTML = "";
       for (let i = 1; i <= npage; i++) {
@@ -245,7 +246,8 @@ class TableView extends HTMLElement {
     };
     //const nview = create("input", div);
     //nview.disabled = true;
-    const nview = create("span", div);
+    const sortview = create("span", div, "sort");
+    const nview = create("span", div, "num");
     [
       ["◀◀", () => show(0)],
       ["◀", () => show(page - 1)],
