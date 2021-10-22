@@ -75,11 +75,12 @@ class TableView extends HTMLElement {
       });
     }
 
-    const inp = create("input", this);
+    const divfilter = create("span", this, "filter");
+    const inp = create("input", divfilter);
     inp.placeholder = "キーワード";
-    const btnfilter = create("button", this);
+    const btnfilter = create("button", divfilter);
     btnfilter.textContent = "フィルタ";
-    const btn = createButton("フィルタ解除", this);
+    const btn = createButton("フィルタ解除", divfilter);
     btn.style.marginLeft = ".5em";
     [inp, btn, btnfilter].forEach(d => {
       d.style.height = "2em";
@@ -144,9 +145,9 @@ class TableView extends HTMLElement {
         name.textContent = h;
         const btns = create("span", div, "sortbtn");
         const upbtn = create("span", btns);
-        upbtn.textContent = sort?.key == h && sort?.up ? "△" : "▲";
+        upbtn.textContent = sort?.key == h && sort?.up ? "▲" : "△";
         const downbtn = create("span", btns);
-        downbtn.textContent = sort?.key == h && !sort?.up ? "▽" : "▼";
+        downbtn.textContent = sort?.key == h && !sort?.up ? "▼" : "▽";
         upbtn.onclick = () => {
           addSort(h, true);
         };
@@ -246,8 +247,11 @@ class TableView extends HTMLElement {
     };
     //const nview = create("input", div);
     //nview.disabled = true;
-    const sortview = create("span", div, "sort");
-    const nview = create("span", div, "num");
+    const spanview = create("span", div, "view");
+    const sortview = create("span", spanview, "sort");
+    const nview = create("span", spanview, "num");
+
+    const btns = create("span", div, "btns");
     [
       ["◀◀", () => show(0)],
       ["◀", () => show(page - 1)],
@@ -256,9 +260,9 @@ class TableView extends HTMLElement {
       ["▶▶", () => show(npage - 1)]
     ].forEach(([label, func]) => {
       if (label == "sel") {
-        div.appendChild(sel);
+        btns.appendChild(sel);
       } else {
-        const span = create("span", div);
+        const span = create("span", btns);
         span.textContent = label;
         span.onclick = func;
       }
@@ -276,7 +280,9 @@ class TableView extends HTMLElement {
     if (this.getAttribute("sortkey")) {
       //console.log(this.getAttribute("sortascending"));
       //console.log(this.getAttribute("sortascending2"));
-      addSort(this.getAttribute("sortkey"), this.getAttribute("sortdesc") !== "");
+      const sortkey = this.getAttribute("sortkey");
+      addSort(sortkey, this.getAttribute("sortdesc") !== "");
+      dayselect.value = sortkey;
     }
   }
 }
