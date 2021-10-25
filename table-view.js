@@ -28,6 +28,18 @@ const getDateColumns = (data) => {
   return res;
 };
 
+const getColumnsExcept = (data, except) => {
+  const res = [];
+  const header = data[0];
+  for (const h of header) {
+    if (except.indexOf(h) == -1) {
+      res.push(h);
+    }
+  }
+  return res;
+};
+
+
 class TableView extends HTMLElement {
   constructor(data, opts) {
     super();
@@ -82,6 +94,9 @@ class TableView extends HTMLElement {
     }
 
     const divfilter = create("span", this, "filter");
+    const notdays = getColumnsExcept(data, days);
+    notdays.unshift("すべて");
+    const selfilter = createSelect(notdays, divfilter);
     const inp = create("input", divfilter);
     inp.placeholder = "キーワード";
     const btnfilter = create("button", divfilter);
@@ -223,16 +238,27 @@ class TableView extends HTMLElement {
     const filterKeyword = (data) => {
       // todo: JISX0213 normalize
       const keys = inp.value.replace("　", " ").split(" ");
+      const filterkey = selfilter.selectedIndex == 0 ? null : selfilter.value;
+      const nfilter = data[0].indexOf(filterkey);
       const filtered = [data[0]];
       B: for (let i = 1; i < data.length; i++) {
         const d = data[i];
         for (const key of keys) {
           let flg = false;
-          A: for (const v of d) {
+          if (nfilter == -1) {
+            A: for (const v of d) {
+              if (typeof v == "string") {
+                if (v.indexOf(key) >= 0) {
+                  flg = true;
+                  break A;
+                }
+              }
+            }
+          } else {
+            const v = d[nfilter];
             if (typeof v == "string") {
               if (v.indexOf(key) >= 0) {
                 flg = true;
-                break A;
               }
             }
           }
@@ -244,11 +270,15 @@ class TableView extends HTMLElement {
       }
       return filtered;
     };
+    selfilter.onchange = () => {
+      showInit(data);
+    };
     inp.onchange = () => {
       showInit(data);
     };
     btn.onclick = () => {
       inp.value = "";
+      selfilter.selectedIndex = 0;
       showInit(data);
     };
     //const nview = create("input", div);
