@@ -218,9 +218,13 @@ class TableView extends HTMLElement {
       const sort = sorts[0];
       //nview.textContent = "表示件数: " + (showdata.length - 1) + " / " + (data.length - 1) + (sort ? " 表示順: " + sort.key + (sort.up ? " 昇順" : " 降順") : "");
       const txtsort = (sort ? " 表示順: " + sort.key + (sort.up ? " 昇順" : " 降順") : "");
-      const txtsum = "表示件数: " + (showdata.length - 1) + " / " + (data.length - 1);
+      //const txtsum = "表示件数: " + (showdata.length - 1) + " / " + (data.length - 1);
+      const txtsum = (showdata.length - 1) + "件 / " + (data.length - 1) + "件";
+      //const txtsum = "表示件数: " + (showdata.length - 1);
+      //const txtsum2 = "データ件数: " + (data.length - 1);
       sortview.textContent = txtsort;
       nview.textContent = txtsum;
+      //nview2.textContent = txtsum2;
 
       sel.innerHTML = "";
       for (let i = 1; i <= npage; i++) {
@@ -308,6 +312,7 @@ class TableView extends HTMLElement {
         span.onclick = func;
       }
     });
+    //const nview2 = create("span", div, "num");
     showInit(data);
 
     if (dayselect) {
