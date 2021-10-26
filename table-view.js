@@ -3,6 +3,9 @@ import { CSV } from "https://js.sabae.cc/CSV.js";
 import { Day } from "https://js.sabae.cc/DateTime.js";
 import { InputDate } from "https://code4fukui.github.io/input-datetime/input-date.js";
 
+//const pagen = 100;
+const pagen = 50;
+
 const isDay = (s) => {
   return s.match(/^(\d\d\d\d-\d\d-\d\d)/) != null;
 };
@@ -111,7 +114,6 @@ class TableView extends HTMLElement {
     
     const divtbl = create("div", this, "table");
     
-    const pagen = 100;
     let page = 0;
     let npage = Math.floor((data.length - 1) / pagen) + ((data.length - 1) % pagen == 0 ? 0 : 1);
     let showdata = null;
