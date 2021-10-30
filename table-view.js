@@ -139,12 +139,23 @@ class TableView extends HTMLElement {
       for (let i = 1; i < showdata.length; i++) {
         showdata2.push(showdata[i]); // .slice(1));
       }
-      showdata2.sort((a, b) => {
-        //const nlen = showdata.length;
-        //console.log(sort.key);
-        const n = a[nsort].localeCompare(b[nsort]);
-        return sort.up ? n : -n;
-      });
+      if (showdata2.length > 0 && typeof showdata2[0][nsort] == "number") {
+        showdata2.sort((a, b) => {
+          const n = a - b;
+          return sort.up ? n : -n;
+        });
+    } else {
+        try {
+          showdata2.sort((a, b) => {
+            //const nlen = showdata.length;
+            //console.log(sort.key);
+            const n = a[nsort].localeCompare(b[nsort]);
+            return sort.up ? n : -n;
+          });
+        } catch (e) {
+          console.log("sort err " + e);
+        }
+      }
       showdata2.unshift(header[0]);
       showdata = showdata2;
       return sort;
