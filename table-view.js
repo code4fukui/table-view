@@ -141,10 +141,10 @@ class TableView extends HTMLElement {
       }
       if (showdata2.length > 0 && typeof showdata2[0][nsort] == "number") {
         showdata2.sort((a, b) => {
-          const n = a - b;
+          const n = a[nsort] - b[nsort];
           return sort.up ? n : -n;
         });
-    } else {
+      } else {
         try {
           showdata2.sort((a, b) => {
             //const nlen = showdata.length;
