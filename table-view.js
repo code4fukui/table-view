@@ -7,6 +7,12 @@ import { InputDate } from "https://code4fukui.github.io/input-datetime/input-dat
 const pagen = 50;
 
 const isDay = (s) => {
+  if (!s) {
+    return false;
+  }
+  if (typeof s != "string") {
+    return false;
+  }
   return s.match(/^(\d\d\d\d-\d\d-\d\d)/) != null;
 };
 
