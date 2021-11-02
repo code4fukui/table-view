@@ -159,7 +159,7 @@ class TableView extends HTMLElement {
             return sort.up ? n : -n;
           });
         } catch (e) {
-          console.log("sort err " + e);
+          //console.log("sort err " + e);
         }
       }
       showdata2.unshift(header[0]);
@@ -281,7 +281,6 @@ class TableView extends HTMLElement {
             A: for (const v of d) {
               if (indexOfIgnoreZenHan(v, key) >= 0) {
                 flg = true;
-                console.log("ig", key, keys, flg, nfilter, "v", v, "key", key)
                 break A;
               }
             }
@@ -289,7 +288,6 @@ class TableView extends HTMLElement {
             const v = d[nfilter];
             if (indexOfIgnoreZenHan(v, key) >= 0) {
               flg = true;
-              console.log("xg" ,key, keys, flg, nfilter, v, key)
             }
           }
           if (!flg) {
