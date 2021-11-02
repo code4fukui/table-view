@@ -2,6 +2,7 @@
 import { CSV } from "https://js.sabae.cc/CSV.js";
 import { Day } from "https://js.sabae.cc/DateTime.js";
 import { InputDate } from "https://code4fukui.github.io/input-datetime/input-date.js";
+import { indexOfIgnoreZenHan } from "https://code4fukui.github.io/mojikiban/indexOfIgnoreZenHan.js";
 
 //const pagen = 100;
 const pagen = 50;
@@ -77,6 +78,11 @@ class TableView extends HTMLElement {
       const div = create("div", this);
       div.className = "datefilter";
       dayselect = createSelect(days, div);
+      /*
+      if (days.length == 1) {
+        dayselect.disabled = true;
+      }
+      */
       startday = new InputDate();
       div.appendChild(startday);
       create("span", div).textContent = "〜";
@@ -273,19 +279,17 @@ class TableView extends HTMLElement {
           let flg = false;
           if (nfilter == -1) {
             A: for (const v of d) {
-              if (typeof v == "string") {
-                if (v.indexOf(key) >= 0) {
-                  flg = true;
-                  break A;
-                }
+              if (indexOfIgnoreZenHan(v, key) >= 0) {
+                flg = true;
+                console.log("ig", key, keys, flg, nfilter, "v", v, "key", key)
+                break A;
               }
             }
           } else {
             const v = d[nfilter];
-            if (typeof v == "string") {
-              if (v.indexOf(key) >= 0) {
-                flg = true;
-              }
+            if (indexOfIgnoreZenHan(v, key) >= 0) {
+              flg = true;
+              console.log("xg" ,key, keys, flg, nfilter, v, key)
             }
           }
           if (!flg) {
@@ -302,11 +306,6 @@ class TableView extends HTMLElement {
     inp.onchange = () => {
       showInit(data);
     };
-    btn.onclick = () => {
-      inp.value = "";
-      selfilter.selectedIndex = 0;
-      showInit(data);
-    };
     //const nview = create("input", div);
     //nview.disabled = true;
     const spanview = create("span", div, "view");
@@ -315,11 +314,11 @@ class TableView extends HTMLElement {
 
     const btns = create("span", div, "btns");
     [
-      ["◀◀", () => show(0)],
+      ["丨◀◀", () => show(0)],
       ["◀", () => show(page - 1)],
       ["sel"],
       ["▶", () => show(page + 1)],
-      ["▶▶", () => show(npage - 1)]
+      ["▶▶丨", () => show(npage - 1)]
     ].forEach(([label, func]) => {
       if (label == "sel") {
         btns.appendChild(sel);
@@ -340,13 +339,23 @@ class TableView extends HTMLElement {
       endday.onchange = redraw;
       dayselect.onchange = redraw;
     }
-    if (dayselect && this.getAttribute("sortkey")) {
-      //console.log(this.getAttribute("sortascending"));
-      //console.log(this.getAttribute("sortascending2"));
-      const sortkey = this.getAttribute("sortkey");
-      addSort(sortkey, this.getAttribute("sortdesc") !== "");
-      dayselect.value = sortkey;
-    }
+    const initialSort = () => {
+      if (dayselect && this.getAttribute("sortkey")) {
+        //console.log(this.getAttribute("sortascending"));
+        //console.log(this.getAttribute("sortascending2"));
+        const sortkey = this.getAttribute("sortkey");
+        addSort(sortkey, this.getAttribute("sortdesc") !== "");
+        dayselect.value = sortkey;
+      }
+    };
+    initialSort();
+
+    btn.onclick = () => {
+      initialSort();
+      inp.value = "";
+      selfilter.selectedIndex = 0;
+      showInit(data);
+    };
   }
 }
 
