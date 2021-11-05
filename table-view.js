@@ -346,7 +346,10 @@ class TableView extends HTMLElement {
       }
     };
     initialSort();
-    dayselect.value = sortkey;
+    const sortkey = this.getAttribute("sortkey");
+    if (dayselect && sortkey) {
+      dayselect.value = sortkey;
+    }
 
     btn.onclick = () => {
       initialSort();
