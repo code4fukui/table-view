@@ -207,6 +207,7 @@ class TableView extends HTMLElement {
       });
       const body = data.length > 1 ? data.slice(1 + n * pagen, 1 + (n + 1) * pagen) : [];
       divtbl.innerHTML = "";
+      let cidx = 0;
       const body2 = body.map(b => {
         const b2 = [b[0]];
         // 最大表示文字列数設定
@@ -224,7 +225,7 @@ class TableView extends HTMLElement {
           const header = data.slice(0, 1)[0];
           const csv = [header, b];
           const json = CSV.toJSON(csv)[0];
-          const div = opts.appendColumn(json);
+          const div = opts.appendColumn(json, cidx++);
           b2.unshift(div);
         }
         return b2;
