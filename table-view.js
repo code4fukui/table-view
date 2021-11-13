@@ -339,7 +339,7 @@ class TableView extends HTMLElement {
       dayselect.onchange = redraw;
     }
     const initialSort = () => {
-      if (dayselect && this.getAttribute("sortkey")) {
+      if (this.getAttribute("sortkey")) {
         //console.log(this.getAttribute("sortascending"));
         //console.log(this.getAttribute("sortascending2"));
         const sortkey = this.getAttribute("sortkey");
